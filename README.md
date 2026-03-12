@@ -99,20 +99,30 @@ make idea
 
 The generated RTL artifacts in this fork were produced with the following toolchain and command flow:
 
+* Reproducible host environment:
+  This build was done from WSL2 on a Windows host, using Ubuntu 24.04.1 LTS (`x86_64`) with Linux kernel `6.6.87.2-microsoft-standard-WSL2`.
+* Reproducible filesystem assumption:
+  The working tree was placed on the Windows `D:` drive at `D:/temp/XiangShan`, seen from WSL as `/mnt/d/temp/XiangShan`.
+* WSL home location:
+  In this environment, `/home/hjs` is available from Windows as `\\wsl.localhost\Ubuntu-24.04\home\hjs`.
 * Workspace location:
   The repository was cloned under `D:/temp/XiangShan` and accessed from WSL as `/mnt/d/temp/XiangShan`.
 * Windows filesystem configuration:
   Because this build was done on a Windows-backed filesystem, NTFS case-sensitivity had to be enabled on `D:/temp/XiangShan` before rebuilding. Without that setting, XiangShan can fail when source files or generated symbols differ only by letter case.
+* Base system packages:
+  The build environment used `git 2.43.0`, `openjdk-17-jdk`, `make`, `gcc`, `g++`, `curl`, `git-lfs`, and `xz`.
 * Git:
   The repository was cloned with `git clone https://github.com/githubhjs/XiangShan/ /mnt/d/temp/XiangShan`.
 * Submodule toolchain:
   XiangShan submodules and nested submodules were initialized with `make init`.
 * Java toolchain:
-  `openjdk-17-jdk` was installed and used as the JVM for `mill` and the Chisel elaboration flow.
+  `openjdk-17-jdk` was installed and used as the JVM for `mill` and the Chisel elaboration flow. The JVM in this build reported `openjdk version "17.0.18"`.
 * Mill build tool:
-  XiangShan pins Mill with `.mill-version`, and the build used Mill `0.12.15` through the project bootstrap flow.
+  XiangShan pins Mill with `.mill-version`, and this repository specifies Mill `0.12.15`. The build used that pinned version through the project bootstrap flow rather than an arbitrary global version.
 * Firtool resolver:
   The firtool path was resolved with `mill -i show xiangshan.resolveFirtoolDeps`, which produced `/home/hjs/.cache/llvm-firtool/1.135.0/bin/firtool`.
+* Firtool version:
+  The resolved firtool binary reports LLVM/CIRCT toolchain version `22.0.0git`.
 * Main RTL generation target:
   Chisel elaboration was run with `make verilog`, which targets `top.TopMain` and writes generated outputs under `build/rtl/`.
 * Direct firtool fallback:
@@ -123,7 +133,7 @@ The generated RTL artifacts in this fork were produced with the following toolch
 * FIR artifact handling:
   The raw FIR file `build/rtl/XSTop.fir` is about 1.2 GB and is too large for a normal GitHub push.
 * Compression toolchain:
-  The FIR artifact was compressed with `xz -T0 -9 -k -f /mnt/d/temp/XiangShan/build/rtl/XSTop.fir`, producing `build/rtl/XSTop.fir.xz`.
+  The FIR artifact was compressed with `xz -T0 -9 -k -f /mnt/d/temp/XiangShan/build/rtl/XSTop.fir`, producing `build/rtl/XSTop.fir.xz`. The compressor in this environment was `xz (XZ Utils) 5.4.5`.
 * Published FIR artifact:
   The compressed FIR file `build/rtl/XSTop.fir.xz` is stored in this fork because it is small enough for normal GitHub upload.
 * Decompression:
