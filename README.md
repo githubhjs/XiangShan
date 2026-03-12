@@ -97,17 +97,39 @@ make idea
 
 ### Notes for this fork
 
-The generated RTL artifacts in this fork were produced with the following workflow:
+The generated RTL artifacts in this fork were produced with the following toolchain and command flow:
 
-* The repository was cloned under `D:/temp/XiangShan` from WSL as `/mnt/d/temp/XiangShan`.
-* On Windows-backed filesystems, `D:/temp/XiangShan` must have NTFS case-sensitivity enabled before building. Otherwise XiangShan can fail on files or generated symbols that differ only by letter case.
-* Required tools installed for the build were `openjdk-17-jdk`, `mill`, `git-lfs`, and the XiangShan-resolved `firtool` binary.
-* Submodules were initialized with `make init`.
-* Chisel elaboration was run with `make verilog`.
-* When the full `make verilog` flow stopped after emitting FIRRTL, `firtool` was run directly on `build/rtl/XSTop.fir` to finish generating the split SystemVerilog files in `build/rtl/`.
-* The generated top-level SystemVerilog output is `build/rtl/XSTop.sv`.
-* The raw FIR artifact `build/rtl/XSTop.fir` is too large for normal GitHub push limits, so this fork stores it in compressed form as `build/rtl/XSTop.fir.xz`.
-* Decompress the FIR artifact with `xz -d build/rtl/XSTop.fir.xz`.
+* Workspace location:
+  The repository was cloned under `D:/temp/XiangShan` and accessed from WSL as `/mnt/d/temp/XiangShan`.
+* Windows filesystem configuration:
+  Because this build was done on a Windows-backed filesystem, NTFS case-sensitivity had to be enabled on `D:/temp/XiangShan` before rebuilding. Without that setting, XiangShan can fail when source files or generated symbols differ only by letter case.
+* Git:
+  The repository was cloned with `git clone https://github.com/githubhjs/XiangShan/ /mnt/d/temp/XiangShan`.
+* Submodule toolchain:
+  XiangShan submodules and nested submodules were initialized with `make init`.
+* Java toolchain:
+  `openjdk-17-jdk` was installed and used as the JVM for `mill` and the Chisel elaboration flow.
+* Mill build tool:
+  XiangShan pins Mill with `.mill-version`, and the build used Mill `0.12.15` through the project bootstrap flow.
+* Firtool resolver:
+  The firtool path was resolved with `mill -i show xiangshan.resolveFirtoolDeps`, which produced `/home/hjs/.cache/llvm-firtool/1.135.0/bin/firtool`.
+* Main RTL generation target:
+  Chisel elaboration was run with `make verilog`, which targets `top.TopMain` and writes generated outputs under `build/rtl/`.
+* Direct firtool fallback:
+  In this environment, `make verilog` produced `build/rtl/XSTop.fir`, but the split SystemVerilog emission had to be completed by directly invoking:
+  `/home/hjs/.cache/llvm-firtool/1.135.0/bin/firtool /mnt/d/temp/XiangShan/build/rtl/XSTop.fir -warn-on-unprocessed-annotations -output-annotation-file /mnt/d/temp/XiangShan/build/rtl/circt.anno.json -O=release --disable-annotation-unknown --lowering-options=explicitBitcast,disallowLocalVariables,disallowPortDeclSharing,locationInfoStyle=none --ignore-read-enable-mem --default-layer-specialization=disable --split-verilog -o=/mnt/d/temp/XiangShan/build/rtl`
+* Generated RTL outputs:
+  The resulting split RTL includes `build/rtl/XSTop.sv` and the rest of the generated `.sv` module set in `build/rtl/`.
+* FIR artifact handling:
+  The raw FIR file `build/rtl/XSTop.fir` is about 1.2 GB and is too large for a normal GitHub push.
+* Compression toolchain:
+  The FIR artifact was compressed with `xz -T0 -9 -k -f /mnt/d/temp/XiangShan/build/rtl/XSTop.fir`, producing `build/rtl/XSTop.fir.xz`.
+* Published FIR artifact:
+  The compressed FIR file `build/rtl/XSTop.fir.xz` is stored in this fork because it is small enough for normal GitHub upload.
+* Decompression:
+  Restore the FIR file with `xz -d build/rtl/XSTop.fir.xz`.
+* Git LFS note:
+  `git-lfs` was installed and tested, but GitHub rejected new LFS object uploads on this public fork. For that reason, the compressed `.xz` artifact is used instead of publishing the raw FIR through LFS.
 
 
 
