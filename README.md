@@ -93,6 +93,7 @@ make idea
 ## Generate Verilog
 
 * Run `make verilog` to generate verilog code. This generates multiple `.sv` files in the `build/rtl/` folder (e.g., `build/rtl/XSTop.sv`).
+* In this fork, the generated FIR artifact is stored in compressed form as `build/rtl/XSTop.fir.xz` to stay within GitHub file size limits. Decompress it with `xz -d build/rtl/XSTop.fir.xz`.
 * Refer to `Makefile` for more information.
 
 
