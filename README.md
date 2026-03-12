@@ -93,8 +93,21 @@ make idea
 ## Generate Verilog
 
 * Run `make verilog` to generate verilog code. This generates multiple `.sv` files in the `build/rtl/` folder (e.g., `build/rtl/XSTop.sv`).
-* In this fork, the generated FIR artifact is stored in compressed form as `build/rtl/XSTop.fir.xz` to stay within GitHub file size limits. Decompress it with `xz -d build/rtl/XSTop.fir.xz`.
 * Refer to `Makefile` for more information.
+
+### Notes for this fork
+
+The generated RTL artifacts in this fork were produced with the following workflow:
+
+* The repository was cloned under `D:/temp/XiangShan` from WSL as `/mnt/d/temp/XiangShan`.
+* On Windows-backed filesystems, `D:/temp/XiangShan` must have NTFS case-sensitivity enabled before building. Otherwise XiangShan can fail on files or generated symbols that differ only by letter case.
+* Required tools installed for the build were `openjdk-17-jdk`, `mill`, `git-lfs`, and the XiangShan-resolved `firtool` binary.
+* Submodules were initialized with `make init`.
+* Chisel elaboration was run with `make verilog`.
+* When the full `make verilog` flow stopped after emitting FIRRTL, `firtool` was run directly on `build/rtl/XSTop.fir` to finish generating the split SystemVerilog files in `build/rtl/`.
+* The generated top-level SystemVerilog output is `build/rtl/XSTop.sv`.
+* The raw FIR artifact `build/rtl/XSTop.fir` is too large for normal GitHub push limits, so this fork stores it in compressed form as `build/rtl/XSTop.fir.xz`.
+* Decompress the FIR artifact with `xz -d build/rtl/XSTop.fir.xz`.
 
 
 
